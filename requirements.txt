@@ -1,7 +1,6 @@
-<<<<<<< HEAD
 # Servidor Web y API
 fastapi==0.109.0
-uvicorn==0.27.0
+uvicorn[standard]==0.27.0
 gunicorn==21.2.0
 pydantic==2.6.0
 
@@ -20,7 +19,3 @@ python-dotenv==1.0.1
 sqlalchemy>=2.0.0
 aiomysql==0.2.0
 cryptography==42.0.0
-=======
-fastapi
-uvicorn[standard]
->>>>>>> feature/health-version
