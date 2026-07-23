@@ -1,0 +1,69 @@
+DIRECTORIO DE DEPENDENCIAS - ALCALDÍA DE FLORIDABLANCA
+
+Fuente: "Banco de preguntas chat asistencial.xlsx" entregado por el cliente (hoja "Atención y PQRSD"), complementado con el sitio oficial https://www.floridablanca.gov.co/publicaciones/31/directorio-de-dependencias/ (Secretaría de Educación, consultado 2026-07-14). Verificar periódicamente con la Alcaldía si estos nombres/extensiones siguen vigentes (los funcionarios pueden cambiar).
+
+Enlace web oficial del directorio completo: https://www.floridablanca.gov.co/publicaciones/31/directorio-de-dependencias/
+Directorio de Entidades Descentralizadas: https://www.floridablanca.gov.co/publicaciones/32/directorio-de-entidades-descentralizadas/
+Directorio de Agremiaciones: https://www.floridablanca.gov.co/publicaciones/33/directorio-de-agremiaciones/
+
+## Secretaría de Hacienda Municipal
+- Secretaria: Alexandra García Esparza
+- Ubicación: Calle 5 N° 8 - 25 Casco Antiguo
+- Teléfono: (607) 6911050
+- General: Ext. 1109 / hacienda@floridablanca.gov.co
+- Impuesto Predial: Ext. 1113 / predial@floridablanca.gov.co
+- Industria y Comercio: Ext. 1105 / industriaycomercio@floridablanca.gov.co
+- Tesorería: Ext. 1114 / tesoreria1@floridablanca.gov.co
+
+## Planeación y Sisbén
+- Secretario de Planeación: Israel Andrés Barragán Jeréz
+- Ubicación: Calle 5 N° 8 - 25 Casco Antiguo
+- Teléfono: (607) 6911050 Ext. 1504 / 1505
+- Correo: sec.planeacion@floridablanca.gov.co
+- Oficina del Sisbén — Responsable: Juan Carlos Gómes Durán
+  - Dirección: Transversal 29 N° 5 - 33 Lagos II
+  - Teléfono: (607) 6911050 Ext. 2408
+  - Correo: sisben@floridablanca.gov.co
+
+## Secretaría del Interior, Seguridad y Convivencia
+- Secretario: Andrés Norberto Ardila Pérez
+- Ubicación: Calle 5 No. 8 - 25 Casco Antiguo
+- Teléfono: (607) 6911050 Ext. 1701
+- Correo: sec.interior@floridablanca.gov.co
+- Casa de Justicia:
+  - Dirección: Avenida 60 N° 42 - 63 Barrio el Carmen
+  - Teléfono: Ext. 1906 / casadejusticia@floridablanca.gov.co
+
+## Desarrollo Social, Salud y Mujer
+- Sec. Desarrollo Social: Chabely Paola Flórez Cepeda (Ext. 2501 / desarrollosocial@floridablanca.gov.co) - Cra 11 N° 5-30.
+- Dirección de la Mujer: Claudia Lucía Ramírez Carreño (Ext. 1906 / direccion.mujer@floridablanca.gov.co) - Cra 11 N° 5-30.
+- Sec. de Salud: Ext. 2400 / salud@floridablanca.gov.co - Tv. 29 N° 5 - 33 Lagos III.
+- Unidad UAO: uao@floridablanca.gov.co - Carrera 9 N° 4 - 02.
+
+## Secretaría de Educación
+- Secretario: Diego Fernando Jaimes Porras
+- Ubicación: Calle 5 N° 8 - 25 Casco Antiguo
+- Teléfono: (607) 6911050 Ext. 1401
+- Correo: educacion@floridablanca.gov.co
+
+## Despacho del Alcalde y Oficinas de Apoyo
+- Alcalde: José Fernando Sánchez (Ext. 1000 / alcalde@floridablanca.gov.co)
+- Oficina Jurídica: Ext. 2000 / notificaciones@floridablanca.gov.co
+- Prensa: Ext. 2100 / prensa@floridablanca.gov.co
+- Contratación: Ext. 1802 / contratacion@floridablanca.gov.co
+- Gestión del Riesgo (OGAMR): Ext. 2301 / ogamr@floridablanca.gov.co
+
+## Secretaría de Turismo y Desarrollo Económico
+- Ubicación: Calle 6 N° 10-36 Piso 3
+(Banco de Empleo Local, capacitaciones y emprendimiento — ver `knowbase/atencion_ciudadano/flujo_pqrsd_atencion.md`, nodo `interes_empleo`)
+
+## Entidad aparte: Dirección de Tránsito y Transporte de Floridablanca (NO es dependencia de la Alcaldía)
+- Dirección: Calle 9 No. 8-14, Floridablanca.
+- Teléfono: (57) (7) 6187919.
+- Portal de radicación: https://portaltransitoflorida.suiteneptuno.com/Correspondencia/Index
+Todo lo relacionado con comparendos, multas de tránsito, fotomultas o trámites vehiculares debe remitirse aquí, NO a la Alcaldía.
+
+## Teléfonos generales (conmutador)
+- Conmutador: (+57) (607) 691 1050
+- Línea gratuita nacional: 01 8000 94 23 70
+- Línea anticorrupción: 01 8000 91 97 48 o 122

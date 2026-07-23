@@ -8,17 +8,13 @@ class Config:
     if not GEMINI_API_KEY:
         raise ValueError("GEMINI_API_KEY no está configurada.")
 
-    # Variables de Base de Datos
-    DB_USER = os.getenv("DB_USER")
-    DB_PASSWORD = os.getenv("DB_PASSWORD")
-    DB_HOST = os.getenv("DB_HOST", "127.0.0.1")  # Default a localhost si no existe
-    DB_PORT = os.getenv("DB_PORT", "3306")       # Default puerto MySQL
-    DB_NAME = os.getenv("DB_NAME")
+    # Proyecto GCP donde viven Firestore (registro de tenants) y el bucket de contexto
+    GCP_PROJECT = os.getenv("GCP_PROJECT")
 
-    @property
-    def DATABASE_URL(self):
-        # Usamos @property para que se genere dinámicamente al llamar a settings.DATABASE_URL
-        # Importante usar el driver aiomysql para asincronía
-        return f"mysql+aiomysql://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+    # Bucket por defecto donde viven los prefijos de cada tenant (identity.json, protocol.json, knowledge/)
+    TENANT_BUCKET = os.getenv("TENANT_BUCKET")
+
+    # TTL del cache en memoria de la config de cada tenant (Firestore -> proceso)
+    TENANT_CACHE_TTL_SECONDS = int(os.getenv("TENANT_CACHE_TTL_SECONDS", "90"))
 
 settings = Config()

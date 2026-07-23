@@ -5,12 +5,6 @@ FROM python:3.10-slim
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Instalamos dependencias de sistema necesarias para drivers de BD y certificados
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    libmariadb-dev \
-    && rm -rf /var/lib/apt/lists/*
-
 WORKDIR /app
 
 # Instalamos dependencias (Copiamos primero para aprovechar el caché de capas de Docker)
