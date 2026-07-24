@@ -3,13 +3,14 @@ fastapi==0.109.0
 uvicorn[standard]==0.27.0
 gunicorn==21.2.0
 pydantic==2.6.0
+pydantic-settings==2.2.1
 
 # Cliente IA (Google Gemini) - SDK nuevo, requerido por File Search Store
-google-genai
+google-genai==1.2.0
 
 # GCP: registro de tenants (Firestore) y bucket de contexto (GCS)
-google-cloud-firestore
-google-cloud-storage
+google-cloud-firestore==2.20.0
+google-cloud-storage==2.19.0
 
 # Scraping y Cliente HTTP (fuente secundaria/opcional, ver scraper_service.py)
 httpx==0.26.0

@@ -1,0 +1,74 @@
+# ⚠️ ATENCIÓN: qam-ia-chatbot y prem-ia-chatbot YA ESTÁN DESPLEGADOS y tienen
+# triggers de Cloud Build con auto-deploy en push a las ramas qa/master. NO
+# mergear/pushear a esas ramas hasta que:
+#   1. Exista la base Firestore (Native mode) en pre-qa-functions.
+#   2. Existan los buckets nexura-chatbot-tenants-qa / -prem.
+#   3. run-sa@pre-qa-functions.iam.gserviceaccount.com tenga roles/datastore.user
+#      y roles/storage.objectViewer sobre el bucket correspondiente.
+#   4. El código se haya validado contra la API real de Gemini File Search.
+# De lo contrario este cloudbuild.yaml rompe en caliente los servicios actuales
+# (código anterior con MySQL, sin este multitenant).
+
+steps:
+  # Build
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/${_PROJECT_ID}/${_SERVICE_NAME}:${COMMIT_SHA}'
+      - '.'
+
+  # Push a Artifact Registry (gcr.io)
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/${_PROJECT_ID}/${_SERVICE_NAME}:${COMMIT_SHA}'
+
+  # Deploy a Cloud Run
+  - name: 'gcr.io/google-cloud-sdk/slim'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - '${_SERVICE_NAME}'
+      - '--image=gcr.io/${_PROJECT_ID}/${_SERVICE_NAME}:${COMMIT_SHA}'
+      - '--region=${_REGION}'
+      - '--platform=managed'
+      - '--ingress=all'
+      - '--no-allow-unauthenticated'
+      - '--service-account=${_RUN_SA}'
+      - '--set-env-vars=ENVIRONMENT=${_ENVIRONMENT},SERVICE_NAME=${_SERVICE_NAME},GOOGLE_CLOUD_PROJECT=${_PROJECT_ID},GCP_PROJECT=${_PROJECT_ID},TENANT_BUCKET=${_TENANT_BUCKET},LOG_LEVEL=${_LOG_LEVEL}'
+      - '--set-secrets=GEMINI_API_KEY=GEMINI_API_KEY:latest'
+      - '--min-instances=${_MIN_INSTANCES}'
+      - '--max-instances=${_MAX_INSTANCES}'
+      - '--memory=${_MEMORY}'
+      - '--cpu=${_CPU}'
+      - '--concurrency=${_CONCURRENCY}'
+      - '--timeout=${_TIMEOUT}'
+
+images:
+  - 'gcr.io/${_PROJECT_ID}/${_SERVICE_NAME}:${COMMIT_SHA}'
+
+# Defaults = ambiente QA (qam-ia-chatbot). Para prem, el trigger de Cloud Build de
+# la rama master debe sobreescribir estas substitutions a nivel de trigger:
+#   _SERVICE_NAME=prem-ia-chatbot, _ENVIRONMENT=prem,
+#   _TENANT_BUCKET=nexura-chatbot-tenants-prem
+substitutions:
+  _SERVICE_NAME: qam-ia-chatbot
+  _REGION: us-central1
+  _PROJECT_ID: pre-qa-functions
+  _ENVIRONMENT: qa
+  _LOG_LEVEL: INFO
+  _TENANT_BUCKET: nexura-chatbot-tenants-qa
+  _RUN_SA: run-sa@pre-qa-functions.iam.gserviceaccount.com
+  _MIN_INSTANCES: '0'
+  _MAX_INSTANCES: '3'
+  _MEMORY: 512Mi
+  _CPU: '1'
+  _CONCURRENCY: '80'
+  _TIMEOUT: '300'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+timeout: 1200s

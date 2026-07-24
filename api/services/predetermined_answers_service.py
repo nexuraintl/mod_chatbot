@@ -1,6 +1,6 @@
 from typing import Optional
 
-from src.services.tenant_service import TenantContext
+from api.services.tenant_service import TenantContext
 
 # Port de buscar_respuesta_predeterminada.py (agente OpenClaw), parametrizado por
 # el predetermined_answers.json de cada tenant en vez de un diccionario hardcodeado.

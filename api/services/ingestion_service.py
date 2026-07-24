@@ -1,18 +1,29 @@
 import logging
+from functools import lru_cache
 from typing import Optional
 
 from google import genai
 from google.cloud import firestore
 
-from src.config import settings
+from api.core.config import get_settings
 
 logger = logging.getLogger(__name__)
+settings = get_settings()
 
-client = genai.Client(api_key=settings.GEMINI_API_KEY)
-_firestore_client = firestore.Client(project=settings.GCP_PROJECT)
+
+# Ver la misma nota en tenant_service.py: los clientes de Firestore/Gemini resuelven
+# credenciales al construirse, no de forma perezosa — se instancian solo al primer uso.
+@lru_cache
+def _client() -> genai.Client:
+    return genai.Client(api_key=settings.gemini_api_key)
+
+
+@lru_cache
+def _firestore_client() -> firestore.Client:
+    return firestore.Client(project=settings.gcp_project)
 
 # Módulo de ingesta compartido entre scripts/sync_tenant_kb.py (backfill/CLI, en este
-# repo) y el handler de Eventarc del servicio ms_ia_chatbot-ingest (repo separado, ver
+# repo) y el handler de Eventarc del servicio ms_chatbot_ingest (repo separado, ver
 # HANDOFF/plan de multitenencia). Nunca se llama desde el request path del chat.
 
 
@@ -22,14 +33,14 @@ def _doc_id_for_path(rel_path: str) -> str:
 
 
 def get_tenant_doc_ref(tenant_id: str):
-    return _firestore_client.collection("tenants").document(tenant_id)
+    return _firestore_client().collection("tenants").document(tenant_id)
 
 
 def ensure_store(tenant_id: str) -> str:
     """
     Devuelve el file_search_store_name del tenant, creándolo y persistiéndolo en
     Firestore la primera vez. Se asume que el documento del tenant ya existe
-    (alta explícita de onboarding, ver plan sección 4.5).
+    (alta explícita de onboarding, ver plan de multitenencia).
     """
     tenant_ref = get_tenant_doc_ref(tenant_id)
     snapshot = tenant_ref.get()
@@ -43,16 +54,16 @@ def ensure_store(tenant_id: str) -> str:
 
     display_name = f"tenant-{tenant_id}"
     store_name = None
-    for store in client.file_search_stores.list():
+    for store in _client().file_search_stores.list():
         if store.display_name == display_name:
             store_name = store.name
             break
     if not store_name:
-        store = client.file_search_stores.create(config={"display_name": display_name})
+        store = _client().file_search_stores.create(config={"display_name": display_name})
         store_name = store.name
 
     tenant_ref.update({"file_search_store_name": store_name})
-    logger.info(f"INGEST_STORE_READY: tenant={tenant_id} store={store_name}")
+    logger.info("ingest_store_ready", extra={"tenant_id": tenant_id, "store_name": store_name})
     return store_name
 
 
@@ -86,14 +97,18 @@ def import_gcs_object(store_name: str, bucket: str, object_name: str, tenant_id:
     old_document_name = get_tracked_document(tenant_id, rel_path)
     if old_document_name:
         try:
-            client.file_search_stores.documents.delete(name=old_document_name, force=True)
+            _client().file_search_stores.documents.delete(name=old_document_name, force=True)
         except Exception as e:
-            logger.warning(f"INGEST_DELETE_OLD_DOC_FAILED: {old_document_name}: {e}", exc_info=True)
+            logger.warning(
+                "ingest_delete_old_doc_failed",
+                exc_info=True,
+                extra={"tenant_id": tenant_id, "document_name": old_document_name, "error": str(e)},
+            )
 
     gcs_uri = f"gs://{bucket}/{object_name}"
-    registered = client.files.register_files(uris=[gcs_uri])
+    registered = _client().files.register_files(uris=[gcs_uri])
 
-    operation = client.file_search_stores.import_file(
+    operation = _client().file_search_stores.import_file(
         file_search_store_name=store_name,
         file_name=registered.files[0].name,
         custom_metadata=[
@@ -104,7 +119,7 @@ def import_gcs_object(store_name: str, bucket: str, object_name: str, tenant_id:
 
     document_name = operation.response.name
     save_tracked_document(tenant_id, rel_path, document_name)
-    logger.info(f"INGEST_OK: tenant={tenant_id} path={rel_path} document={document_name}")
+    logger.info("ingest_ok", extra={"tenant_id": tenant_id, "rel_path": rel_path, "document_name": document_name})
     return document_name
 
 
@@ -112,9 +127,9 @@ def remove_gcs_object(tenant_id: str, rel_path: str) -> None:
     """Contraparte de import_gcs_object para cuando se borra un archivo del bucket."""
     document_name = get_tracked_document(tenant_id, rel_path)
     if not document_name:
-        logger.warning(f"INGEST_DELETE_NOOP: no había documento trackeado para tenant={tenant_id} path={rel_path}")
+        logger.warning("ingest_delete_noop", extra={"tenant_id": tenant_id, "rel_path": rel_path})
         return
 
-    client.file_search_stores.documents.delete(name=document_name, force=True)
+    _client().file_search_stores.documents.delete(name=document_name, force=True)
     delete_tracked_document(tenant_id, rel_path)
-    logger.info(f"INGEST_DELETED: tenant={tenant_id} path={rel_path} document={document_name}")
+    logger.info("ingest_deleted", extra={"tenant_id": tenant_id, "rel_path": rel_path, "document_name": document_name})

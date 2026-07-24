@@ -1,18 +1,18 @@
-# src/routers/chat_router.py
+# api/routers/v1/chat_router.py
 
 import logging
 
 from fastapi import APIRouter, HTTPException
 
-from src.models.schemas import ChatRequest, ChatResponse
-from src.services.gemini_service import generate_answer, is_context_sufficient
-from src.services.predetermined_answers_service import find_predetermined_answer
-from src.services.scraper_service import scrape_specific_urls, scrape_url_with_context
-from src.services.tenant_service import TenantNotFoundError, get_tenant
+from api.models.schemas import ChatRequest, ChatResponse
+from api.services.gemini_service import generate_answer, is_context_sufficient
+from api.services.predetermined_answers_service import find_predetermined_answer
+from api.services.scraper_service import scrape_specific_urls, scrape_url_with_context
+from api.services.tenant_service import TenantNotFoundError, get_tenant
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter()
+router = APIRouter(tags=["chat"])
 
 
 @router.post("/chat", response_model=ChatResponse)
@@ -59,5 +59,9 @@ async def chat_endpoint(payload: ChatRequest):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"ERROR en chat_endpoint (tenant={payload.tenant_id}): {e}", exc_info=True)
+        logger.error(
+            "chat_endpoint_error",
+            exc_info=True,
+            extra={"tenant_id": payload.tenant_id, "error": str(e)},
+        )
         raise HTTPException(status_code=500, detail="Error interno procesando la solicitud.")

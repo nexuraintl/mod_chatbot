@@ -3,16 +3,30 @@ import json
 import logging
 import time
 from dataclasses import dataclass, field
+from functools import lru_cache
 from typing import Any, Dict, Optional
 
 from google.cloud import firestore, storage
 
-from src.config import settings
+from api.core.config import get_settings
 
 logger = logging.getLogger(__name__)
+settings = get_settings()
 
-_firestore_client = firestore.AsyncClient(project=settings.GCP_PROJECT)
-_storage_client = storage.Client(project=settings.GCP_PROJECT)
+
+# Los clientes de Firestore/GCS resuelven credenciales (ADC) al construirse, no de
+# forma perezosa — instanciarlos a nivel de módulo rompe cualquier import que no
+# tenga credenciales reales disponibles (incluidos los tests). @lru_cache los crea
+# una sola vez, en el primer uso real, y los reutiliza después (mismo efecto que un
+# singleton a nivel de módulo, pero sin el costo en import time).
+@lru_cache
+def _firestore_client() -> firestore.AsyncClient:
+    return firestore.AsyncClient(project=settings.gcp_project)
+
+
+@lru_cache
+def _storage_client() -> storage.Client:
+    return storage.Client(project=settings.gcp_project)
 
 
 class TenantNotFoundError(Exception):
@@ -36,14 +50,14 @@ _cache: Dict[str, "tuple[float, TenantContext]"] = {}
 
 
 def _read_gcs_json(bucket_name: str, path: str) -> Dict[str, Any]:
-    blob = _storage_client.bucket(bucket_name).blob(path)
+    blob = _storage_client().bucket(bucket_name).blob(path)
     if not blob.exists():
         return {}
     return json.loads(blob.download_as_text())
 
 
 async def _load_tenant(tenant_id: str) -> TenantContext:
-    doc_ref = _firestore_client.collection("tenants").document(tenant_id)
+    doc_ref = _firestore_client().collection("tenants").document(tenant_id)
     snapshot = await doc_ref.get()
 
     if not snapshot.exists:
@@ -74,14 +88,14 @@ async def _load_tenant(tenant_id: str) -> TenantContext:
 
 
 async def get_tenant(tenant_id: str) -> TenantContext:
-    """Resuelve la config de un tenant, cacheada en memoria con TTL (settings.TENANT_CACHE_TTL_SECONDS)."""
+    """Resuelve la config de un tenant, cacheada en memoria con TTL (settings.tenant_cache_ttl_seconds)."""
     cached = _cache.get(tenant_id)
-    if cached and (time.monotonic() - cached[0]) < settings.TENANT_CACHE_TTL_SECONDS:
+    if cached and (time.monotonic() - cached[0]) < settings.tenant_cache_ttl_seconds:
         return cached[1]
 
     tenant = await _load_tenant(tenant_id)
     _cache[tenant_id] = (time.monotonic(), tenant)
-    logger.info(f"TENANT_RESOLVED: {tenant_id}")
+    logger.info("tenant_resolved", extra={"tenant_id": tenant_id})
     return tenant
 
 
