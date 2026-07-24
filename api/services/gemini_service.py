@@ -11,7 +11,9 @@ from api.core.config import get_settings
 logger = logging.getLogger(__name__)
 settings = get_settings()
 
-MODEL_NAME = "gemini-2.0-flash"
+# "gemini-2.0-flash" quedó deprecado (404 NOT_FOUND validado contra la API real
+# el 2026-07 — Google recomienda migrar a la Interactions API a futuro).
+MODEL_NAME = "gemini-2.5-flash"
 
 
 @lru_cache

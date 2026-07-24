@@ -197,6 +197,16 @@ pytest
 
 ## 10. Estado y pendientes conocidos
 
-- El uso de `google-genai` / File Search Store (`file_search_stores`, `files.register_files`) está implementado siguiendo la documentación oficial de Gemini. Las versiones pinneadas en `requirements.txt` (`google-genai`, `google-cloud-firestore`, `google-cloud-storage`) **instalan y pasan los tests** (`pytest` corrido de verdad, no solo `py_compile`), pero **ninguna llamada se ha probado todavía contra la API real de Gemini** — sigue siendo el spike pendiente antes de un deploy real.
-- Firestore, los buckets de tenants y los permisos IAM de `run-sa` **no existen todavía** en `pre-qa-functions` — ver `docs/MANUAL.md` para los comandos exactos de creación.
+- ✅ **Spike de `google-genai`/File Search Store validado contra la API real** (2026-07-24), incluyendo `gemini_service.generate_answer()` tal cual corre en producción (no una reimplementación). Se encontraron y corrigieron 5 discrepancias reales entre lo documentado y el SDK instalado:
+  1. `google-genai==1.2.0` (pin original) **no tiene `file_search_stores`** — hace falta `>=2.14.0`.
+  2. Ese salto de versión arrastra `httpx>=0.28`, incompatible con el `TestClient` de `fastapi==0.109.0` (`app=` fue removido) — se subió todo el stack de FastAPI/Starlette/Uvicorn a versiones modernas (ver `requirements.txt`).
+  3. `import_file(custom_metadata=[...])` no existe como kwarg directo — va envuelto en `config=types.ImportFileConfig(custom_metadata=[types.CustomMetadata(key=..., string_value=...)])`.
+  4. `import_file()` es una long-running operation: hay que hacer *polling* con `client.operations.get(operation)` hasta `done=True` antes de leer `operation.response` — si no, `document_name` queda `None` (rompía el borrado de duplicados). Y el campo correcto es `operation.response.document_name`, no `.name`.
+  5. `documents.delete(force=True)` tampoco es kwarg directo — va en `config=types.DeleteDocumentConfig(force=True)`; y `name=` espera el resource name completo (`fileSearchStores/.../documents/...`), no el ID corto.
+  6. `files.register_files()` requiere un `auth=` (credenciales de GCP) explícito — no lo toma solo del entorno.
+  7. `gemini-2.0-flash` está deprecado (404) — se migró a `gemini-2.5-flash`.
+
+  Todo esto ya está corregido en `api/services/gemini_service.py` e `ingestion_service.py` (ambos repos) y **probado de punta a punta con el `GEMINI_API_KEY` real** (creación de store, subida de documento, `import_file`, retrieval vía `generate_content`, borrado de documento y de store).
+- ⚠️ **No probado todavía:** el paso específico `files.register_files(uris=["gs://..."])` contra un bucket real (la Parte B del spike) — la Parte A validó todo lo demás usando `files.upload()` con un archivo local como sustituto, porque esta máquina no tiene Application Default Credentials configuradas contra `pre-qa-functions`. Es la única llamada de `ingestion_service.py` que sigue sin verificación directa, aunque su firma (`auth=` requerido) ya se corrigió según la documentación del método.
+- Firestore, los buckets de tenants y los permisos IAM de `run-sa` — el usuario reporta que ya fueron creados/otorgados en `pre-qa-functions`; pendiente de una verificación end-to-end con un tenant real (ver `examples/tenants/floridablanca/`).
 - `examples/tenants/floridablanca/` es el primer tenant de referencia, con contenido real migrado desde el agente OpenClaw equivalente; `examples/tenants/floridablanca/PENDING.md` documenta qué contenido sigue faltando por parte del cliente.

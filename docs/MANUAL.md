@@ -85,11 +85,11 @@ Definido en `cloudbuild.yaml` (defaults = QA; `prem` sobreescribe `_SERVICE_NAME
 | Artifact Registry | `gcr.io/pre-qa-functions/<service>` (Container Registry heredado, no Artifact Registry regional) |
 
 ⚠️ **No ejecutar el deploy real (ni mergear a `qa`/`master`, que auto-despliegan) hasta:**
-1. Crear la base Firestore Native mode en `pre-qa-functions` (ver comando abajo).
-2. Crear los buckets `nexura-chatbot-tenants-qa` / `-prem`.
-3. Otorgar los roles de IAM de la sección 5.
-4. Validar `google-genai`/File Search Store contra la API real (spike pendiente, ver README sección 10).
-5. Dar de alta el tenant `floridablanca` y comparar respuestas contra el agente OpenClaw actual.
+1. ✅ Crear la base Firestore Native mode en `pre-qa-functions` — hecho (reportado por el usuario 2026-07-24).
+2. ✅ Crear los buckets `nexura-chatbot-tenants-qa` / `-prem` — hecho.
+3. ✅ Otorgar los roles de IAM de la sección 5 — hecho.
+4. ✅ Validar `google-genai`/File Search Store contra la API real — hecho (2026-07-24), 5 discrepancias reales encontradas y corregidas; ver README sección 10 para el detalle. Pendiente solo el paso específico `files.register_files` contra un bucket real (necesita ADC local, que todavía no está configurado en esta máquina).
+5. Dar de alta el tenant `floridablanca` y comparar respuestas contra el agente OpenClaw actual — **siguiente paso pendiente**.
 
 ```bash
 gcloud firestore databases create --project=pre-qa-functions --location=us-central1 --type=firestore-native
