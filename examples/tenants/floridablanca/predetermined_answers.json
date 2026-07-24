@@ -3,7 +3,6 @@
     { "keyword": "menú principal", "answer_key": "menu_principal" },
     { "keyword": "volver al inicio", "answer_key": "menu_principal" },
     { "keyword": "menú", "answer_key": "menu_principal" },
-    { "keyword": "inicio", "answer_key": "menu_principal" },
 
     { "keyword": "impuesto predial", "answer_key": "impuestos_predial" },
     { "keyword": "consultar predio", "answer_key": "impuestos_predial" },
