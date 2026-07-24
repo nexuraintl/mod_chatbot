@@ -46,7 +46,8 @@ ms_ia_chatbot/
 ├── cloudbuild.yaml                 # Build + push + deploy a Cloud Run (pre-qa-functions)
 ├── .azure-pipelines.yml            # Bridge ADO -> GitHub (nexuraintl), dispara Cloud Build
 ├── scripts/
-│   └── sync_tenant_kb.py           # CLI de backfill/reprocesamiento manual de un tenant
+│   ├── onboard_tenant.py           # CLI de alta inicial de un tenant (Firestore + subida + ingesta)
+│   └── sync_tenant_kb.py           # CLI de backfill/reprocesamiento manual de un tenant ya dado de alta
 ├── examples/tenants/floridablanca/ # Tenant de referencia completo (identity/protocol/predeterminadas/knowledge)
 ├── tests/
 │   ├── conftest.py
@@ -197,7 +198,7 @@ pytest
 
 ## 10. Estado y pendientes conocidos
 
-- ✅ **Spike de `google-genai`/File Search Store validado contra la API real** (2026-07-24), incluyendo `gemini_service.generate_answer()` tal cual corre en producción (no una reimplementación). Se encontraron y corrigieron 5 discrepancias reales entre lo documentado y el SDK instalado:
+- ✅ **Spike de `google-genai`/File Search Store validado de punta a punta contra la API real** (2026-07-24), incluyendo `gemini_service.generate_answer()` tal cual corre en producción y el flujo completo de `ingestion_service.import_gcs_object()` contra un bucket real (`gs://nexura-chatbot-tenants-qa/...`, no un archivo local). Se encontraron y corrigieron **9 discrepancias reales** entre lo documentado/asumido y el comportamiento real de la API:
   1. `google-genai==1.2.0` (pin original) **no tiene `file_search_stores`** — hace falta `>=2.14.0`.
   2. Ese salto de versión arrastra `httpx>=0.28`, incompatible con el `TestClient` de `fastapi==0.109.0` (`app=` fue removido) — se subió todo el stack de FastAPI/Starlette/Uvicorn a versiones modernas (ver `requirements.txt`).
   3. `import_file(custom_metadata=[...])` no existe como kwarg directo — va envuelto en `config=types.ImportFileConfig(custom_metadata=[types.CustomMetadata(key=..., string_value=...)])`.
@@ -205,8 +206,11 @@ pytest
   5. `documents.delete(force=True)` tampoco es kwarg directo — va en `config=types.DeleteDocumentConfig(force=True)`; y `name=` espera el resource name completo (`fileSearchStores/.../documents/...`), no el ID corto.
   6. `files.register_files()` requiere un `auth=` (credenciales de GCP) explícito — no lo toma solo del entorno.
   7. `gemini-2.0-flash` está deprecado (404) — se migró a `gemini-2.5-flash`.
+  8. **El scope de las credenciales de `auth=` para `register_files()` no alcanza con el default de `google.auth.default()`** — la API responde `403 ACCESS_TOKEN_SCOPE_INSUFFICIENT` a menos que se pidan explícitamente los scopes `https://www.googleapis.com/auth/cloud-platform` **y** `https://www.googleapis.com/auth/devstorage.read_only` (ya corregido en `_gcp_credentials()`, ambos repos). Con credenciales de **usuario** (`gcloud auth application-default login`), pedir un scope no estándar puede además chocar con la pantalla de "aplicación bloqueada" de Google si el cliente OAuth no está verificado para ese scope — con una service account (JWT, sin pantalla de consentimiento) no pasa.
+  9. **`import_file()` necesita un permiso de IAM adicional que no está documentado en ningún lado obvio**: el propio *service agent* gestionado por Google para la Generative Language API (`service-<PROJECT_NUMBER>@gcp-sa-generativelanguage.iam.gserviceaccount.com`) es quien lee el objeto de GCS al importar — no nuestra identidad — y necesita `roles/storage.objectViewer` (o equivalente) sobre el bucket del tenant. Sin este permiso, `import_file()` falla con `403 PERMISSION_DENIED: ...does not have storage.objects.get access...`. **Ya otorgado** sobre `nexura-chatbot-tenants-qa` y `nexura-chatbot-tenants-prem` (ver `docs/MANUAL.md` sección 5) — hace falta repetirlo si se crea un bucket de tenants nuevo.
 
-  Todo esto ya está corregido en `api/services/gemini_service.py` e `ingestion_service.py` (ambos repos) y **probado de punta a punta con el `GEMINI_API_KEY` real** (creación de store, subida de documento, `import_file`, retrieval vía `generate_content`, borrado de documento y de store).
-- ⚠️ **No probado todavía:** el paso específico `files.register_files(uris=["gs://..."])` contra un bucket real (la Parte B del spike) — la Parte A validó todo lo demás usando `files.upload()` con un archivo local como sustituto, porque esta máquina no tiene Application Default Credentials configuradas contra `pre-qa-functions`. Es la única llamada de `ingestion_service.py` que sigue sin verificación directa, aunque su firma (`auth=` requerido) ya se corrigió según la documentación del método.
-- Firestore, los buckets de tenants y los permisos IAM de `run-sa` — el usuario reporta que ya fueron creados/otorgados en `pre-qa-functions`; pendiente de una verificación end-to-end con un tenant real (ver `examples/tenants/floridablanca/`).
-- `examples/tenants/floridablanca/` es el primer tenant de referencia, con contenido real migrado desde el agente OpenClaw equivalente; `examples/tenants/floridablanca/PENDING.md` documenta qué contenido sigue faltando por parte del cliente.
+  Todo esto ya está corregido en `api/services/gemini_service.py` e `ingestion_service.py` (ambos repos).
+- ✅ **Tenant `floridablanca` dado de alta y operativo en `pre-qa-functions`** (2026-07-24): documento en Firestore, contenido subido a `gs://nexura-chatbot-tenants-qa/floridablanca/` y 21 documentos de `knowledge/` indexados en su File Search Store (`fileSearchStores/tenantfloridablanca-oagnjysqdgfr`). Verificado end-to-end: el fast-path de respuestas predeterminadas y `generate_answer()` con retrieval real (probado con una pregunta sobre el calendario tributario 2026, respondió citando correctamente la Resolución 6059/2025). Ver `scripts/onboard_tenant.py` para dar de alta el próximo tenant.
+- Firestore, los buckets de tenants y los permisos IAM base de `run-sa` (`datastore.user`, `storage.objectViewer`) — creados/otorgados en `pre-qa-functions`, confirmados funcionando en el onboarding de `floridablanca`.
+- `examples/tenants/floridablanca/` es el contenido de referencia que se usó para el alta real; `examples/tenants/floridablanca/PENDING.md` documenta qué contenido sigue faltando por parte del cliente (no bloquea el uso del tenant, son mejoras incrementales).
+- Pendiente siguiente: comparar respuestas del chatbot multitenant contra las del agente OpenClaw equivalente con preguntas reales del guion oficial, y desplegar `ms_chatbot_ingest` + su trigger de Eventarc para que la ingesta futura sea automática (hoy el alta/resync se corre a mano con `scripts/onboard_tenant.py` / `scripts/sync_tenant_kb.py`).

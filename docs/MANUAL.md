@@ -50,10 +50,11 @@ Cumplimiento del estándar **GOB-GCP-STD-01**. Última actualización: 2026-07-2
 
 | Cuenta | Rol en este servicio | Roles requeridos | Estado |
 |---|---|---|---|
-| `run-sa@pre-qa-functions.iam.gserviceaccount.com` | Identidad de ejecución del Cloud Run (compartida entre los 4 servicios: `qam`/`prem` × `ia-chatbot`/`chatbot-ingest`) | `roles/datastore.user` (Firestore), lectura del bucket de tenants (`roles/storage.objectViewer` alcanza; `ms_ia_chatbot` solo lee) | ⚠️ **Pendiente de otorgar** — hoy no tiene ninguno de los dos. |
+| `run-sa@pre-qa-functions.iam.gserviceaccount.com` | Identidad de ejecución del Cloud Run (compartida entre los 4 servicios: `qam`/`prem` × `ia-chatbot`/`chatbot-ingest`) | `roles/datastore.user` (Firestore), lectura del bucket de tenants (`roles/storage.objectViewer` alcanza; `ms_ia_chatbot` solo lee) | ✅ Otorgado (confirmado funcionando en el alta real del tenant `floridablanca`, 2026-07-24). |
 | `deploy-sa@pre-qa-functions.iam.gserviceaccount.com` | Cuenta que usa Cloud Build para build + push + deploy | Permisos estándar de Cloud Build/Cloud Run deploy (ya operativos, usados por los servicios `ia-chatbot` actuales) | ✅ Operativo |
+| `service-<PROJECT_NUMBER>@gcp-sa-generativelanguage.iam.gserviceaccount.com` (service agent gestionado por Google, uno por proyecto) | Lee el objeto de GCS **en nombre de Google** durante `file_search_stores.import_file()` — no es nuestra identidad la que lee el archivo | `roles/storage.objectViewer` sobre el bucket de tenants | ✅ Otorgado sobre `nexura-chatbot-tenants-qa` y `-prem` (2026-07-24). Descubierto durante el alta real del tenant `floridablanca`: sin este permiso, `import_file()` falla con `403 PERMISSION_DENIED: ...does not have storage.objects.get access...` aunque `run-sa` y las credenciales de `register_files()` estén correctas. **Repetir este bloqueo si se crea un bucket de tenants nuevo** — el número de proyecto (`58937908768` en `pre-qa-functions`) se obtiene con `gcloud projects describe pre-qa-functions --format="value(projectNumber)"`. |
 
-Comandos para otorgar los roles pendientes a `run-sa` (ejecutar una vez existan los buckets):
+Comandos para otorgar los roles (ya ejecutados en `pre-qa-functions`; repetir para un proyecto/bucket nuevo):
 
 ```bash
 gcloud projects add-iam-policy-binding pre-qa-functions \
@@ -66,6 +67,15 @@ gcloud storage buckets add-iam-policy-binding gs://nexura-chatbot-tenants-qa \
 
 gcloud storage buckets add-iam-policy-binding gs://nexura-chatbot-tenants-prem \
   --member="serviceAccount:run-sa@pre-qa-functions.iam.gserviceaccount.com" \
+  --role="roles/storage.objectViewer"
+
+# Service agent de Generative Language (necesario para import_file() contra GCS):
+gcloud storage buckets add-iam-policy-binding gs://nexura-chatbot-tenants-qa \
+  --member="serviceAccount:service-58937908768@gcp-sa-generativelanguage.iam.gserviceaccount.com" \
+  --role="roles/storage.objectViewer"
+
+gcloud storage buckets add-iam-policy-binding gs://nexura-chatbot-tenants-prem \
+  --member="serviceAccount:service-58937908768@gcp-sa-generativelanguage.iam.gserviceaccount.com" \
   --role="roles/storage.objectViewer"
 ```
 
@@ -87,9 +97,10 @@ Definido en `cloudbuild.yaml` (defaults = QA; `prem` sobreescribe `_SERVICE_NAME
 ⚠️ **No ejecutar el deploy real (ni mergear a `qa`/`master`, que auto-despliegan) hasta:**
 1. ✅ Crear la base Firestore Native mode en `pre-qa-functions` — hecho (reportado por el usuario 2026-07-24).
 2. ✅ Crear los buckets `nexura-chatbot-tenants-qa` / `-prem` — hecho.
-3. ✅ Otorgar los roles de IAM de la sección 5 — hecho.
-4. ✅ Validar `google-genai`/File Search Store contra la API real — hecho (2026-07-24), 5 discrepancias reales encontradas y corregidas; ver README sección 10 para el detalle. Pendiente solo el paso específico `files.register_files` contra un bucket real (necesita ADC local, que todavía no está configurado en esta máquina).
-5. Dar de alta el tenant `floridablanca` y comparar respuestas contra el agente OpenClaw actual — **siguiente paso pendiente**.
+3. ✅ Otorgar los roles de IAM de la sección 5 — hecho, incluyendo el permiso del service agent de Generative Language (descubierto durante el onboarding real, ver sección 5).
+4. ✅ Validar `google-genai`/File Search Store contra la API real, de punta a punta incluyendo `import_file()` contra un bucket real — hecho (2026-07-24), 9 discrepancias reales encontradas y corregidas; ver README sección 10 para el detalle.
+5. ✅ Dar de alta el tenant `floridablanca` — hecho (2026-07-24): Firestore + bucket + 21 documentos indexados en su File Search Store, verificado end-to-end con `generate_answer()` real.
+6. Comparar respuestas del chatbot multitenant contra el agente OpenClaw actual con preguntas reales del guion oficial — **siguiente paso pendiente**, no bloquea el deploy.
 
 ```bash
 gcloud firestore databases create --project=pre-qa-functions --location=us-central1 --type=firestore-native
