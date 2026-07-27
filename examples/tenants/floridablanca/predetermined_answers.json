@@ -1,0 +1,139 @@
+{
+  "keywords": [
+    { "keyword": "menú principal", "answer_key": "menu_principal" },
+    { "keyword": "volver al inicio", "answer_key": "menu_principal" },
+    { "keyword": "menú", "answer_key": "menu_principal" },
+
+    { "keyword": "impuesto predial", "answer_key": "impuestos_predial" },
+    { "keyword": "consultar predio", "answer_key": "impuestos_predial" },
+    { "keyword": "predial", "answer_key": "impuestos_predial" },
+
+    { "keyword": "qué es el ica", "answer_key": "ica_concepto" },
+    { "keyword": "que es el ica", "answer_key": "ica_concepto" },
+    { "keyword": "consultar ica", "answer_key": "ica_consultar" },
+    { "keyword": "estado de cuenta ica", "answer_key": "ica_consultar" },
+    { "keyword": "declarar ica", "answer_key": "ica_declarar" },
+    { "keyword": "declaración de ica", "answer_key": "ica_declarar" },
+    { "keyword": "pagar ica", "answer_key": "ica_pagar" },
+    { "keyword": "nuevo contribuyente", "answer_key": "ica_preregistro" },
+    { "keyword": "preregistro ica", "answer_key": "ica_preregistro" },
+    { "keyword": "industria y comercio", "answer_key": "impuestos_ica" },
+    { "keyword": "ica", "answer_key": "impuestos_ica" },
+
+    { "keyword": "qué es reteica", "answer_key": "rete_concepto" },
+    { "keyword": "que es reteica", "answer_key": "rete_concepto" },
+    { "keyword": "qué es el reteica", "answer_key": "rete_concepto" },
+    { "keyword": "que es el reteica", "answer_key": "rete_concepto" },
+    { "keyword": "consultar reteica", "answer_key": "rete_consultar" },
+    { "keyword": "declarar reteica", "answer_key": "rete_declarar" },
+    { "keyword": "reteica en ceros", "answer_key": "rete_ceros" },
+    { "keyword": "sin retenciones", "answer_key": "rete_ceros" },
+    { "keyword": "pagar reteica", "answer_key": "rete_pagar" },
+    { "keyword": "reteica", "answer_key": "impuestos_reteica" },
+
+    { "keyword": "cese de actividades", "answer_key": "impuestos_rit" },
+    { "keyword": "rit", "answer_key": "impuestos_rit" },
+
+    { "keyword": "impuestos", "answer_key": "impuestos_menu" },
+
+    { "keyword": "consultar radicado", "answer_key": "pqrsd_consultar" },
+    { "keyword": "estado de mi radicado", "answer_key": "pqrsd_consultar" },
+    { "keyword": "consultar mi pqrsd", "answer_key": "pqrsd_consultar" },
+    { "keyword": "certificado de estratificación", "answer_key": "pqrsd_estrato" },
+    { "keyword": "estrato", "answer_key": "pqrsd_estrato" },
+    { "keyword": "sisbén", "answer_key": "pqrsd_sisben" },
+    { "keyword": "geoportal", "answer_key": "pqrsd_geoportal" },
+    { "keyword": "pqrsd", "answer_key": "pqrsd" },
+    { "keyword": "pqrs", "answer_key": "pqrsd" },
+    { "keyword": "petición", "answer_key": "pqrsd" },
+    { "keyword": "queja", "answer_key": "pqrsd" },
+    { "keyword": "reclamo", "answer_key": "pqrsd" },
+    { "keyword": "denuncia", "answer_key": "pqrsd" },
+
+    { "keyword": "trámites y servicios", "answer_key": "tramites" },
+    { "keyword": "trámites", "answer_key": "tramites" },
+
+    { "keyword": "directorio", "answer_key": "directorio" },
+    { "keyword": "transparencia", "answer_key": "transparencia" },
+    { "keyword": "participación ciudadana", "answer_key": "participacion" },
+
+    { "keyword": "comparendo", "answer_key": "transito_redirect" },
+    { "keyword": "multa de tránsito", "answer_key": "transito_redirect" },
+    { "keyword": "fotomulta", "answer_key": "transito_redirect" },
+    { "keyword": "runt", "answer_key": "transito_redirect" },
+    { "keyword": "tránsito", "answer_key": "transito_redirect" },
+
+    { "keyword": "matrícula", "answer_key": "educacion_matricula" },
+    { "keyword": "cupo escolar", "answer_key": "educacion_matricula" },
+    { "keyword": "cupos escolares", "answer_key": "educacion_matricula" },
+
+    { "keyword": "concepto sanitario", "answer_key": "salud_concepto_sanitario" },
+
+    { "keyword": "agendar cita", "answer_key": "agendar_cita" },
+    { "keyword": "agenda una cita", "answer_key": "agendar_cita" },
+
+    { "keyword": "escríbale al alcalde", "answer_key": "escribale_alcalde" },
+    { "keyword": "escribir al alcalde", "answer_key": "escribale_alcalde" }
+  ],
+  "answers": {
+    "menu_principal": "🏛️ Bienvenido al Asistente Virtual de la Alcaldía Municipal de Floridablanca (Santander). ¿En qué puedo ayudarle hoy?\n📌 Seleccione una opción:\n📄 1. Trámites y Servicios\n🏦 2. Impuestos\n📨 3. Atención y PQRSD\n🔎 4. Transparencia\n🤝 5. Participación Ciudadana\n📰 6. Noticias y Eventos\n📇 7. Directorio\n❓ 8. Preguntas Frecuentes\n\nPor favor, escriba el número o el nombre de la opción que desea consultar.",
+
+    "impuestos_menu": "¿Sobre cuál impuesto necesita información?\n🏠 Predial | 🏢 Industria y Comercio (ICA) | 📊 ReteICA | 📝 RIT (cancelación por cese de actividades)\n\nIndíqueme cuál y con gusto le explico el paso a paso.",
+
+    "impuestos_predial": "Para consultar o pagar su Impuesto Predial, debe ingresar al portal oficial de la Alcaldía:\n🌐 https://portal.floridablanca.suiteneptuno.com/Predial/Index\nAllí podrá consultar el estado de su predio con los datos que el propio portal le solicite.",
+
+    "impuestos_ica": "¿Qué necesita sobre el Impuesto de Industria y Comercio (ICA)?\n📖 ¿Qué es el ICA? | 🔎 Consultar estado de cuenta | 📝 Declarar | 💳 Pagar en línea | 🆕 Registrarme como nuevo contribuyente\n\n🌐 Portal: https://portal.floridablanca.suiteneptuno.com/IndustriaComercio/Index",
+
+    "ica_concepto": "El Impuesto de Industria y Comercio (ICA) es un gravamen municipal obligatorio que se genera por realizar, de forma directa o indirecta, cualquier actividad industrial, comercial o de servicios en Floridablanca (con o sin local físico, de forma permanente u ocasional). Deben declararlo las personas naturales, jurídicas o sociedades de hecho que ejecuten estas actividades en el municipio.\n🌐 Portal: https://portal.floridablanca.suiteneptuno.com/IndustriaComercio/Index",
+
+    "ica_consultar": "Para consultar el estado de cuenta de su ICA:\n1️⃣ Ingrese a https://portal.floridablanca.suiteneptuno.com/IndustriaComercio/Index\n2️⃣ Digite el NIT de la empresa o persona natural registrada.\n3️⃣ Escriba su Contraseña RIT asignada.\n4️⃣ Resuelva el captcha y haga clic en \"Buscar establecimiento\".\nAllí verá declaraciones presentadas, pagos anteriores y saldos pendientes.",
+
+    "ica_declarar": "Para registrar su declaración web de ICA:\n1️⃣ Inicie sesión en el portal con su NIT y Contraseña RIT: https://portal.floridablanca.suiteneptuno.com/IndustriaComercio/Index\n2️⃣ Seleccione el periodo a declarar según el Calendario Tributario.\n3️⃣ Diligencie sus ingresos; el sistema liquida el impuesto automáticamente.\n4️⃣ Genere el formulario en PDF (puede pagarlo en línea o presentarlo físicamente en bancos autorizados).",
+
+    "ica_pagar": "Para pagar su ICA en línea:\n1️⃣ Ingrese al portal con su NIT y Contraseña RIT: https://portal.floridablanca.suiteneptuno.com/IndustriaComercio/Index\n2️⃣ Si tiene una declaración lista o saldo pendiente, haga clic en \"Generar Factura\".\n3️⃣ Elija pagos electrónicos (botón PSE).\n4️⃣ Seleccione su banco e ingrese sus credenciales financieras de forma segura.",
+
+    "ica_preregistro": "Si inició una actividad comercial en Floridablanca y necesita reportarla por primera vez, debe hacer el Pre-Registro virtual de ICA ingresando toda la información de su negocio:\n🌐 https://portal.floridablanca.suiteneptuno.com/IndustriaComercio/Index\nTenga a la mano el RUT de la DIAN y los datos de su establecimiento.",
+
+    "impuestos_reteica": "¿Qué necesita sobre el ReteICA (retención en la fuente del Impuesto de Industria y Comercio)?\n📖 ¿Qué es el ReteICA? | 🔎 Consultar estado de cuenta | 📝 Declarar | 💳 Pagar en línea\n\n🌐 Portal: https://portal.floridablanca.suiteneptuno.com/Reteica/Index",
+
+    "rete_concepto": "El ReteICA es un mecanismo de recaudo anticipado del Impuesto de Industria y Comercio. Cuando un agente retenedor realiza un pago o abono en cuenta a un proveedor por bienes o servicios gravados con ICA en el municipio, debe retenerle un porcentaje y luego declarar y entregar esos valores a la Alcaldía.\n🌐 Portal: https://portal.floridablanca.suiteneptuno.com/Reteica/Index",
+
+    "rete_consultar": "Para consultar su estado de cuenta de ReteICA:\n1️⃣ Ingrese a https://portal.floridablanca.suiteneptuno.com/Reteica/Index\n2️⃣ Digite el NIT del agente retenedor.\n3️⃣ Escriba su Contraseña asignada (enviada a su correo).\n4️⃣ Resuelva el captcha y haga clic en \"Buscar establecimiento\".\nVerá el histórico de declaraciones y pagos realizados.",
+
+    "rete_declarar": "Para presentar su declaración de ReteICA:\n1️⃣ Inicie sesión en https://portal.floridablanca.suiteneptuno.com/Reteica/Index con su NIT y Contraseña.\n2️⃣ Seleccione el periodo según el Calendario Tributario vigente.\n3️⃣ Registre las retenciones practicadas a terceros en el periodo.\n4️⃣ Genere el formulario en PDF (puede pagarlo en línea o presentarlo físicamente en bancos autorizados).",
+
+    "rete_pagar": "Para pagar su ReteICA en línea:\n1️⃣ Ingrese al portal con sus credenciales: https://portal.floridablanca.suiteneptuno.com/Reteica/Index\n2️⃣ Haga clic en \"Generar Factura\" sobre el saldo o formulario a liquidar.\n3️⃣ Elija pagos electrónicos (botón PSE).\n4️⃣ Seleccione su entidad bancaria y complete la transacción de forma segura.",
+
+    "rete_ceros": "Si en un periodo no practicó retenciones a terceros, igual debe presentar la declaración de ReteICA seleccionando el periodo respectivo en ceros ($0), para evitar sanciones por extemporaneidad u omisión:\n🌐 https://portal.floridablanca.suiteneptuno.com/Reteica/Index",
+
+    "impuestos_rit": "Si cerró su negocio o dejó de prestar servicios en Floridablanca, debe tramitar la Cancelación del RIT. Necesita: formulario de cese de actividades, certificado de Cámara de Comercio (si aplica), copia de cédula y última declaración de ICA pagada. Puede radicarlo virtualmente en https://portal.floridablanca.suiteneptuno.com/Correspondencia/Index o presencialmente en el primer piso del Palacio Municipal (Calle 5 No. 8 - 25 Casco Urbano).",
+
+    "pqrsd": "¿Qué necesita hacer?\n📨 Radicar una PQRSD | 🔎 Consultar mi radicado | 🚗 Trámites de Tránsito | 🗺️ Geoportal | 📇 Directorio de dependencias\n\nPara radicar una PQRSD, ingrese a: https://www.floridablanca.gov.co/publicaciones/72/recepcion-de-pqrsdf/",
+
+    "pqrsd_consultar": "Para consultar el estado de una PQRSD ya radicada:\n1️⃣ Ingrese al portal de correspondencia: https://portal.floridablanca.suiteneptuno.com/Correspondencia/Index\n2️⃣ Busque la opción \"Consulta\".\n3️⃣ Digite el Número de Radicado que le asignaron al enviar el documento.\nEl sistema mostrará el estado actual, la dependencia encargada y la respuesta oficial si ya está disponible.",
+
+    "pqrsd_sisben": "Trámites del SISBÉN en Floridablanca:\n📊 Consultar su puntaje: verifique su clasificación del Sisbén IV en la base de datos nacional.\n📝 Solicitar nueva encuesta o modificación: si cambió de dirección, de composición familiar o su vivienda no ha sido censada, radique la solicitud en https://portal.floridablanca.suiteneptuno.com/Correspondencia/Radicacion/Radicacion adjuntando documentos de identidad del núcleo familiar y un recibo de servicio público.\n📍 Atención presencial: Transversal 29 N° 5 - 33 Lagos II (Ext. 2408).",
+
+    "pqrsd_estrato": "El Certificado de Estratificación Socioeconómica lo emite la Secretaría de Planeación y confirma el estrato oficial de un predio (útil para servicios públicos o trámites notariales). Debe radicar una solicitud formal en https://portal.floridablanca.suiteneptuno.com/Correspondencia/Radicacion/Radicacion adjuntando el número de cuenta predial o la dirección exacta del inmueble.",
+
+    "pqrsd_geoportal": "El Geoportal Municipal de Floridablanca (tecnología ArcGIS) le permite consultar mapas oficiales, el Plan de Ordenamiento Territorial (POT), subdivisiones de Catastro y datos geoespaciales del municipio:\n🌐 https://geoportal-floridablanca-sig-floridab.hub.arcgis.com/",
+
+    "tramites": "Puede consultar el catálogo completo de trámites y servicios (filtrable por dependencia) en:\n🌐 https://www.floridablanca.gov.co/tramites\n\nTambién puede agendar una cita: https://www.floridablanca.gov.co/publicaciones/1809/agenda-una-cita/",
+
+    "directorio": "Puede consultar el directorio completo de dependencias en:\n🌐 https://www.floridablanca.gov.co/publicaciones/31/directorio-de-dependencias/",
+
+    "transparencia": "Puede consultar la información de Transparencia y Acceso a la Información Pública en:\n🌐 https://www.floridablanca.gov.co/publicaciones/5/transparencia-y-acceso-a-la-informacion-publica/",
+
+    "participacion": "Puede consultar los espacios de Participación Ciudadana en:\n🌐 https://www.floridablanca.gov.co/1168",
+
+    "transito_redirect": "Todo lo relacionado con comparendos, multas de tránsito, fotomultas, RUNT o trámites vehiculares NO se radica ni se resuelve en la Alcaldía. Debe dirigirse a la Dirección de Tránsito y Transporte de Floridablanca:\n📍 Calle 9 No. 8-14, Floridablanca\n☎️ (57)(7) 6187919\n🌐 Portal de radicación: https://portaltransitoflorida.suiteneptuno.com/Correspondencia/Index",
+
+    "educacion_matricula": "La matrícula escolar, asignación de cupos o traslado de estudiantes no se gestiona a través de este canal. Le recomendamos contactar directamente a la institución educativa de su interés, o a la Secretaría de Educación:\n📧 educacion@floridablanca.gov.co\n☎️ (607) 691 1050 Ext. 1401",
+
+    "salud_concepto_sanitario": "El Concepto Sanitario (para acreditar el cumplimiento de normas sanitarias de un establecimiento) es un trámite en línea, sin costo, con un tiempo de respuesta de 15 días hábiles. Puede iniciarlo en:\n🌐 https://www.floridablanca.gov.co/tramites/17/concepto-sanitario/",
+
+    "agendar_cita": "Para agendar una cita presencial en la Alcaldía, ingrese a:\n🌐 https://www.floridablanca.gov.co/publicaciones/1809/agenda-una-cita/",
+
+    "escribale_alcalde": "Para enviar su mensaje directamente al Alcalde, ingrese al formulario oficial:\n🌐 https://www.floridablanca.gov.co/formularios/2/escribale-al-alcalde/"
+  }
+}

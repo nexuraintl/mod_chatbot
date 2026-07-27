@@ -1,0 +1,38 @@
+### Seguridad y Datos Personales
+**Respuesta para consulta de datos con cédula:**
+"Por seguridad, **no** puedo consultar información personal únicamente con el número de cédula. **Le** recomiendo utilizar los canales oficiales de autenticación en el portal tributario o la sede electrónica de la Alcaldía para acceder a su información.
+
+**Por favor**, ingrese a [https://www.floridablanca.gov.co/](https://www.floridablanca.gov.co/) o al portal tributario [https://portal.floridablanca.suiteneptuno.com/Home/Index](https://portal.floridablanca.suiteneptuno.com/Home/Index) y autentíquese con sus datos.
+¿Necesita ayuda para acceder a su cuenta?"
+
+**Respuesta para pregunta: ¿Es seguro dar mis datos personales por este chat?**
+"Le recomendamos **no compartir** información sensible como contraseñas, números de tarjetas bancarias, códigos de verificación o documentos personales completos a través de este chat.
+
+**Utilice siempre los canales oficiales de la Alcaldía** y comparta únicamente la información que sea necesaria para realizar su consulta o trámite.
+
+Si alguien le pide datos confidenciales, **no los comparta** y denuncie a través del correo institucional: `notificaciones@floridablanca.gov.co`."
+
+**Respuesta para pregunta: Necesito actualizar mis datos personales, ¿cómo lo hago?**
+"La actualización de datos personales **debe realizarse a través de los canales oficiales habilitados por la Alcaldía**.
+
+Puede:
+- Ingresar a la **sede electrónica** [https://www.floridablanca.gov.co/](https://www.floridablanca.gov.co/) y seguir los pasos de autenticación.
+- Dirigirse a las **oficinas de atención al ciudadano** para recibir orientación personalizada.
+
+**No comparta información sensible** por este medio. Si tiene dudas, consulte los canales oficiales."
+
+**Respuesta para pregunta: ¿Qué datos personales me van a pedir aquí?**
+"Dependiendo de su consulta, podrían solicitarse **datos básicos de identificación o contacto** necesarios para gestionar un trámite o solicitud.
+
+**Nunca** se le solicitarán:
+- Contraseñas o claves personales.
+- Números de tarjetas bancarias o códigos de seguridad.
+- Fotos completas de su cédula o documentos de identidad.
+- Información financiera confidencial.
+
+Si alguien le pide estos datos, **no los comparta** y denuncie a través del correo oficial: `notificaciones@floridablanca.gov.co`."
+
+**Respuesta para pregunta: ¿Quién puede ver la conversación que estoy teniendo contigo?**
+"Las conversaciones pueden ser supervisadas por **personal autorizado de la Alcaldía** para fines de atención, seguimiento, mejora del servicio y cumplimiento de las políticas de protección de datos.
+
+**Le recomendamos no compartir información sensible o confidencial** que no sea necesaria para su consulta. Si tiene dudas sobre privacidad, consulte los canales oficiales."

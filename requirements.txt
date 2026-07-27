@@ -1,21 +1,28 @@
 # Servidor Web y API
-fastapi==0.109.0
-uvicorn[standard]==0.27.0
+# fastapi/uvicorn se subieron desde 0.109.0/0.27.0: esa version usaba un
+# starlette.TestClient incompatible con el httpx>=0.28 que exige google-genai
+# (rompe con TypeError: Client.__init__() got an unexpected keyword argument
+# 'app' -- validado contra la API real el 2026-07).
+fastapi==0.115.6
+uvicorn[standard]==0.32.1
 gunicorn==21.2.0
-pydantic==2.6.0
+pydantic==2.12.5
+pydantic-settings==2.7.1
 
-# Cliente IA (Google Gemini)
-google-generativeai==0.4.1
+# Cliente IA (Google Gemini) - SDK nuevo, requerido por File Search Store.
+# 1.2.0 (pin original) NO tiene file_search_stores en absoluto -- validado
+# contra la API real, es la version minima verificada que sí lo expone.
+google-genai==2.14.0
 
-# Scraping y Cliente HTTP
-httpx==0.26.0
+# GCP: registro de tenants (Firestore) y bucket de contexto (GCS)
+google-cloud-firestore==2.20.0
+google-cloud-storage==2.19.0
+
+# Scraping y Cliente HTTP (fuente secundaria/opcional, ver scraper_service.py)
+# Sin pin fijo: debe quedar en la version que google-genai 2.14.0 exige (>=0.28).
+httpx==0.28.1
 beautifulsoup4==4.12.3
 
 # Robustez y Utilidades
 tenacity==8.2.3
 python-dotenv==1.0.1
-
-# Base de Datos (VPC)
-sqlalchemy>=2.0.0
-aiomysql==0.2.0
-cryptography==42.0.0
