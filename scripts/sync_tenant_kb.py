@@ -10,8 +10,8 @@ File Search Store. Pensado para:
   - la carga inicial de un tenant nuevo (ej. migrar knowbase/ de Floridablanca de una vez).
   - reprocesar manualmente si algo quedó desincronizado.
 
-No reemplaza el trigger automático de Eventarc (ver ms_ia_chatbot-ingest) — lo
-complementa. Reusa la misma lógica de src/services/ingestion_service.py.
+No reemplaza el trigger automático de Eventarc (ver ms_chatbot_ingest) — lo
+complementa. Reusa la misma lógica de api/services/ingestion_service.py.
 """
 
 import sys
@@ -21,8 +21,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from google.cloud import storage  # noqa: E402
 
-from src.services import ingestion_service  # noqa: E402
-from src.services.ingestion_service import get_tenant_doc_ref  # noqa: E402
+from api.services import ingestion_service  # noqa: E402
+from api.services.ingestion_service import get_tenant_doc_ref  # noqa: E402
 
 
 def sync_tenant(tenant_id: str) -> None:
@@ -38,7 +38,7 @@ def sync_tenant(tenant_id: str) -> None:
 
     store_name = ingestion_service.ensure_store(tenant_id)
 
-    storage_client = storage.Client(project=ingestion_service.settings.GCP_PROJECT)
+    storage_client = storage.Client(project=ingestion_service.settings.gcp_project)
     blobs = storage_client.list_blobs(bucket_name, prefix=knowledge_prefix)
 
     count = 0

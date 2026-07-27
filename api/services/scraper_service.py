@@ -7,12 +7,12 @@ from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_excep
 from pydantic import HttpUrl
 
 # Importamos la función de filtrado desde nuestro servicio de IA
-from src.services.gemini_service import filter_relevant_links 
+from api.services.gemini_service import filter_relevant_links
 
 # --- CONSTANTES DE CONTROL ---
-MAX_PAGES_TO_CRAWL = 5  
-MAX_CONTEXT_LENGTH = 100000 
-TIMEOUT_SECONDS = 5.0 
+MAX_PAGES_TO_CRAWL = 5
+MAX_CONTEXT_LENGTH = 100000
+TIMEOUT_SECONDS = 5.0
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (compatible; MicroserviceBot/1.0)",
@@ -43,28 +43,28 @@ def _get_internal_links(soup: BeautifulSoup, base_url: str) -> List[Tuple[str, s
     base_netloc = urlparse(base_url).netloc
     internal_links = []
     seen_urls = set()
-    
+
     for link_tag in soup.find_all('a', href=True):
         href = link_tag['href']
         title = link_tag.get_text(strip=True) # El texto del enlace
-        
+
         if not title: # Ignoramos enlaces sin texto
             continue
 
         full_url = urljoin(base_url, href)
         parsed_url = urlparse(full_url)
-        
+
         # Filtro: mismo dominio, esquema web y sin anclas (#)
         if (parsed_url.scheme in ('http', 'https') and
             parsed_url.netloc == base_netloc and
             parsed_url.fragment == ''):
-            
+
             clean_url = f"{parsed_url.scheme}://{parsed_url.netloc}{parsed_url.path}"
-            
+
             if clean_url not in seen_urls:
                 internal_links.append((title, clean_url))
                 seen_urls.add(clean_url)
-            
+
     print(f"DEBUG LINKS: Se extrajeron {len(internal_links)} enlaces con título para filtrar.")
     return internal_links
 
@@ -78,7 +78,7 @@ async def _fetch_and_scrape(client: httpx.AsyncClient, url: str) -> Tuple[str, s
     print(f"DEBUG: Descargando -> {url}")
     try:
         response = await client.get(url, headers=HEADERS, timeout=TIMEOUT_SECONDS, follow_redirects=True)
-        response.raise_for_status() 
+        response.raise_for_status()
 
         try:
             html_content = response.content.decode('utf-8')
@@ -89,7 +89,7 @@ async def _fetch_and_scrape(client: httpx.AsyncClient, url: str) -> Tuple[str, s
 
     except httpx.RequestError as e:
         print(f"ADVERTENCIA: Reintentando {url} debido a error de red: {type(e).__name__}")
-        raise e 
+        raise e
     except httpx.HTTPStatusError as e:
         print(f"ADVERTENCIA: Error HTTP {e.response.status_code} en {url}. Saltando.")
         return url, ""
@@ -103,7 +103,7 @@ async def scrape_url_with_context(url: str, question: str) -> str:
     async with httpx.AsyncClient() as client:
         # 1. Scraping de la página principal
         main_url, raw_html = await _fetch_and_scrape(client, url)
-        
+
         if not raw_html:
             raise Exception("No se pudo acceder a la URL principal.")
 
@@ -115,7 +115,7 @@ async def scrape_url_with_context(url: str, question: str) -> str:
         # 3. Filtrado Inteligente con Gemini
         print(f"DEBUG: Consultando a Gemini para filtrar {len(potential_links)} enlaces...")
         relevant_urls = await filter_relevant_links(question, potential_links, MAX_PAGES_TO_CRAWL)
-        
+
         # Evitamos re-descargar la principal
         secondary_links = [l for l in relevant_urls if l.rstrip('/') != main_url.rstrip('/')]
         print(f"DEBUG: IA seleccionó {len(secondary_links)} URLs relevantes.")
@@ -130,12 +130,12 @@ async def scrape_url_with_context(url: str, question: str) -> str:
 
         for link, raw_content in results:
             if raw_content:
-                text = _clean_and_extract_text(raw_content) 
+                text = _clean_and_extract_text(raw_content)
                 if current_length + len(text) < MAX_CONTEXT_LENGTH:
                     full_context.append(f"\n--- CONTEXTO ADICIONAL RELEVANTE: {link} ---\n{text}")
                     current_length += len(text)
                 else:
-                    break 
+                    break
 
         return "".join(full_context)
 

@@ -1,17 +1,24 @@
 import json
 import logging
+from functools import lru_cache
 from typing import Any, Dict, List, Optional, Tuple
 
 from google import genai
 from google.genai import types
 
-from src.config import settings
+from api.core.config import get_settings
 
 logger = logging.getLogger(__name__)
+settings = get_settings()
 
-client = genai.Client(api_key=settings.GEMINI_API_KEY)
+# "gemini-2.0-flash" quedó deprecado (404 NOT_FOUND validado contra la API real
+# el 2026-07 — Google recomienda migrar a la Interactions API a futuro).
+MODEL_NAME = "gemini-2.5-flash"
 
-MODEL_NAME = "gemini-2.0-flash"
+
+@lru_cache
+def _client() -> genai.Client:
+    return genai.Client(api_key=settings.gemini_api_key)
 
 
 def get_or_create_store(tenant_id: str) -> str:
@@ -24,10 +31,10 @@ def get_or_create_store(tenant_id: str) -> str:
     volver a listar stores en cada request.
     """
     display_name = f"tenant-{tenant_id}"
-    for store in client.file_search_stores.list():
+    for store in _client().file_search_stores.list():
         if store.display_name == display_name:
             return store.name
-    store = client.file_search_stores.create(config={"display_name": display_name})
+    store = _client().file_search_stores.create(config={"display_name": display_name})
     return store.name
 
 
@@ -69,7 +76,7 @@ async def generate_answer(
     prompt = "\n\n".join(prompt_parts)
 
     try:
-        response = client.models.generate_content(
+        response = _client().models.generate_content(
             model=MODEL_NAME,
             contents=prompt,
             config=types.GenerateContentConfig(
@@ -79,7 +86,7 @@ async def generate_answer(
         )
         return response.text
     except Exception as e:
-        logger.error(f"GEMINI_GENERATE_ERROR: {e}", exc_info=True)
+        logger.error("gemini_generate_error", exc_info=True, extra={"error": str(e)})
         return "Lo siento, ocurrió un error al procesar la respuesta. Por favor intente de nuevo."
 
 
@@ -96,10 +103,10 @@ async def is_context_sufficient(question: str, context_text: str) -> bool:
     CONTEXTO: {context_text[:2000]}
     """
     try:
-        response = client.models.generate_content(model=MODEL_NAME, contents=prompt)
+        response = _client().models.generate_content(model=MODEL_NAME, contents=prompt)
         return "SI" in response.text.upper()
     except Exception as e:
-        logger.warning(f"GEMINI_CONTEXT_CHECK_FAILED: {e}", exc_info=True)
+        logger.warning("gemini_context_check_failed", exc_info=True, extra={"error": str(e)})
         return False
 
 
@@ -125,7 +132,7 @@ async def filter_relevant_links(question: str, links: List[Tuple[str, str]], max
     """
 
     try:
-        response = client.models.generate_content(model=MODEL_NAME, contents=prompt)
+        response = _client().models.generate_content(model=MODEL_NAME, contents=prompt)
         content = response.text.strip()
 
         if "NINGUNO" in content:
@@ -134,5 +141,5 @@ async def filter_relevant_links(question: str, links: List[Tuple[str, str]], max
         urls = [url.strip() for url in content.split(",") if "http" in url]
         return urls[:max_links]
     except Exception as e:
-        logger.warning(f"GEMINI_LINK_FILTER_FAILED: {e}", exc_info=True)
+        logger.warning("gemini_link_filter_failed", exc_info=True, extra={"error": str(e)})
         return [url for _, url in links[:max_links]]
