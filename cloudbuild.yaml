@@ -1,13 +1,9 @@
-# ⚠️ ATENCIÓN: qam-ia-chatbot y prem-ia-chatbot YA ESTÁN DESPLEGADOS y tienen
-# triggers de Cloud Build con auto-deploy en push a las ramas qa/master. NO
-# mergear/pushear a esas ramas hasta que:
-#   1. Exista la base Firestore (Native mode) en pre-qa-functions.
-#   2. Existan los buckets nexura-chatbot-tenants-qa / -prem.
-#   3. run-sa@pre-qa-functions.iam.gserviceaccount.com tenga roles/datastore.user
-#      y roles/storage.objectViewer sobre el bucket correspondiente.
-#   4. El código se haya validado contra la API real de Gemini File Search.
-# De lo contrario este cloudbuild.yaml rompe en caliente los servicios actuales
-# (código anterior con MySQL, sin este multitenant).
+# qam-ia-chatbot: Firestore, buckets, IAM (incl. el service agent de Generative
+# Language sobre el bucket, ver docs/MANUAL.md sección 5) y el trigger de Cloud
+# Build (apunta a este archivo desde 2026-07-27) ya están validados contra el
+# tenant real floridablanca. prem-ia-chatbot todavía no se tocó — su trigger de
+# la rama master puede tener el mismo problema de builder image/service name
+# que tuvo este (ver historial de fixes), revisar antes de pushear a master.
 
 steps:
   # Build
@@ -25,7 +21,13 @@ steps:
       - 'gcr.io/${_PROJECT_ID}/${_SERVICE_NAME}:${COMMIT_SHA}'
 
   # Deploy a Cloud Run
-  - name: 'gcr.io/google-cloud-sdk/slim'
+  # gcr.io/google-cloud-sdk/slim quedó deprecado (Google migró el path a
+  # Artifact Registry) -- deploy-sa no tiene artifactregistry.downloadArtifacts
+  # sobre projects/google-cloud-sdk, así que ese pull falla con 403 tras la
+  # migración. gcr.io/google.com/cloudsdktool/cloud-sdk sigue siendo el path
+  # público válido; es el que usan todos los demás triggers reales del
+  # proyecto (validado en el build real c6f66cf4..., 2026-07-27).
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
     entrypoint: gcloud
     args:
       - 'run'
