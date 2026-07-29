@@ -94,13 +94,16 @@ Definido en `cloudbuild.yaml` (defaults = QA; `prem` sobreescribe `_SERVICE_NAME
 | Ingress | `all` (decisión deliberada — restringir a `internal-and-cloud-load-balancing` causó problemas de acceso desde el API Gateway) |
 | Artifact Registry | `gcr.io/pre-qa-functions/<service>` (Container Registry heredado, no Artifact Registry regional) |
 
-⚠️ **No ejecutar el deploy real (ni mergear a `qa`/`master`, que auto-despliegan) hasta:**
-1. ✅ Crear la base Firestore Native mode en `pre-qa-functions` — hecho (reportado por el usuario 2026-07-24).
-2. ✅ Crear los buckets `nexura-chatbot-tenants-qa` / `-prem` — hecho.
-3. ✅ Otorgar los roles de IAM de la sección 5 — hecho, incluyendo el permiso del service agent de Generative Language (descubierto durante el onboarding real, ver sección 5).
-4. ✅ Validar `google-genai`/File Search Store contra la API real, de punta a punta incluyendo `import_file()` contra un bucket real — hecho (2026-07-24), 9 discrepancias reales encontradas y corregidas; ver README sección 10 para el detalle.
-5. ✅ Dar de alta el tenant `floridablanca` — hecho (2026-07-24): Firestore + bucket + 21 documentos indexados en su File Search Store, verificado end-to-end con `generate_answer()` real.
-6. Comparar respuestas del chatbot multitenant contra el agente OpenClaw actual con preguntas reales del guion oficial — **siguiente paso pendiente**, no bloquea el deploy.
+✅ **`qam-ia-chatbot` está desplegado en QA con el código multitenant y verificado de punta a punta en producción (2026-07-29)** — revisión `qam-ia-chatbot-00004-656`, imagen `gcr.io/pre-qa-functions/qam-ia-chatbot:59d6e84...`. Checklist completo:
+1. ✅ Firestore Native mode en `pre-qa-functions` — hecho.
+2. ✅ Buckets `nexura-chatbot-tenants-qa` / `-prem` — hecho.
+3. ✅ Roles de IAM de la sección 5, incluyendo el service agent de Generative Language — hecho.
+4. ✅ `google-genai`/File Search Store validado de punta a punta contra la API real — hecho (2026-07-24), 9 discrepancias reales encontradas y corregidas; ver README sección 10.
+5. ✅ Tenant `floridablanca` dado de alta — hecho (2026-07-24): Firestore + bucket + 21 documentos indexados.
+6. ✅ Trigger de Cloud Build corregido (apuntaba al servicio/repo equivocado y a una imagen de builder deprecada — ver README sección 10) y probado con un deploy real exitoso.
+7. ✅ Probado end-to-end vía el Gateway real (`https://qa-apig-functions-v1-r2q3xgg.uc.gateway.dev/ia/chatbot/api/v1/chat`): `/health`, fast-path de respuestas predeterminadas y retrieval real de Gemini/File Search (`source: "knowledge_base"`) — todos responden correctamente con el tenant `floridablanca`.
+
+Pendiente, no bloqueante: comparar respuestas contra el agente OpenClaw actual con preguntas reales del guion oficial; repetir esta misma validación para `prem-ia-chatbot` (rama `master`) antes de tocarla — su trigger de Cloud Build probablemente tenga los mismos dos bugs que tuvo el de QA.
 
 ```bash
 gcloud firestore databases create --project=pre-qa-functions --location=us-central1 --type=firestore-native
