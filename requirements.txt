@@ -18,11 +18,8 @@ google-genai==2.14.0
 google-cloud-firestore==2.20.0
 google-cloud-storage==2.19.0
 
-# Scraping y Cliente HTTP (fuente secundaria/opcional, ver scraper_service.py)
-# Sin pin fijo: debe quedar en la version que google-genai 2.14.0 exige (>=0.28).
+# Cliente HTTP -- requerido por google-genai (>=0.28) y por el TestClient de FastAPI.
 httpx==0.28.1
-beautifulsoup4==4.12.3
 
 # Robustez y Utilidades
-tenacity==8.2.3
 python-dotenv==1.0.1

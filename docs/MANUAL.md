@@ -31,7 +31,7 @@ Cumplimiento del estándar **GOB-GCP-STD-01**. Última actualización: 2026-07-2
 |---|---|---|---|
 | GET | `/health` | No | `{"status": "UP"}` |
 | GET | `/version` | No | `{"service", "version", "environment"}` |
-| POST | `/api/v1/chat` | Vía API Gateway | `{"tenant_id", "question", "url"?}` → `{"answer", "source"}` |
+| POST | `/api/v1/chat` | Vía API Gateway | `{"tenant_id", "question"}` → `{"answer", "source"}` |
 
 ## 4. Variables y secretos
 

@@ -11,7 +11,6 @@ Dado `{"tenant_id": "floridablanca", "question": "..."}`, el servicio:
 1. Resuelve la configuración del tenant (Firestore + cache en memoria con TTL).
 2. Intenta responder con una **respuesta predeterminada** (fast path, sin costo de LLM) si la pregunta matchea un keyword conocido del tenant.
 3. Si no hay match, genera la respuesta con **Gemini**, usando el **File Search Store** del tenant como fuente de contexto (RAG administrado por Google sobre la base de conocimiento del tenant).
-4. Opcionalmente, si el request trae una `url` puntual y el tenant lo permite, suma ese contexto vía scraping como fuente secundaria.
 
 No hay integración con WhatsApp ni autenticación propia — el servicio solo responde preguntas dado un tenant válido; la mensajería y la autenticación quedan del lado del API Gateway/cliente que consuma este API.
 
@@ -27,7 +26,6 @@ No hay integración con WhatsApp ni autenticación propia — el servicio solo r
 | Modelo de IA / RAG | Google Gemini (`google-genai`), File Search Store |
 | Registro de tenants | Google Cloud Firestore |
 | Contenido de tenants | Google Cloud Storage (bucket por prefijo de tenant) |
-| Scraping (fuente secundaria opcional) | httpx + BeautifulSoup4 |
 | Contenerización | Docker multi-stage (`python:3.11-slim`, usuario no-root) |
 | Despliegue | GCP Cloud Run (proyecto `pre-qa-functions` en preproducción/QA) |
 
@@ -68,7 +66,6 @@ ms_ia_chatbot/
         ├── tenant_service.py               # Resolución de tenant: Firestore + GCS, cacheado con TTL
         ├── predetermined_answers_service.py # Fast path de respuestas sin LLM
         ├── gemini_service.py                # Integración Gemini (google-genai) + File Search Store
-        ├── scraper_service.py               # Scraping web (fuente secundaria opcional)
         └── ingestion_service.py             # Ingesta de contenido del bucket al File Search Store del tenant
 ```
 
@@ -106,19 +103,17 @@ Ambos endpoints devuelven el header `X-Correlation-ID` (generado si el request n
 ```json
 {
   "tenant_id": "floridablanca",
-  "question": "¿Cómo pago mi impuesto predial?",
-  "url": "https://ejemplo.gov.co/opcional"
+  "question": "¿Cómo pago mi impuesto predial?"
 }
 ```
-- `tenant_id` (string, requerido).
+- `tenant_id` (string, requerido, no vacío).
 - `question` (string, requerido).
-- `url` (string o lista de strings, opcional) — solo se usa si el tenant tiene `allow_url_scraping: true`.
 
 **Response 200:**
 ```json
 {
   "answer": "Para pagar su impuesto predial debe...",
-  "source": "predetermined | knowledge_base | knowledge_base+scraping"
+  "source": "predetermined | knowledge_base"
 }
 ```
 
@@ -158,8 +153,7 @@ Colección `tenants`, un documento por `tenant_id`:
   "file_search_store_name": "fileSearchStores/...",
   "identity_path": "floridablanca/identity.json",
   "protocol_path": "floridablanca/protocol.json",
-  "predetermined_answers_path": "floridablanca/predetermined_answers.json",
-  "allow_url_scraping": false
+  "predetermined_answers_path": "floridablanca/predetermined_answers.json"
 }
 ```
 

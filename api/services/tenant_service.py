@@ -39,7 +39,6 @@ class TenantContext:
     bucket: str
     prefix: str
     file_search_store_name: Optional[str]
-    allow_url_scraping: bool
     identity: Dict[str, Any] = field(default_factory=dict)
     protocol: Dict[str, Any] = field(default_factory=dict)
     predetermined_answers: Dict[str, Any] = field(default_factory=dict)
@@ -80,7 +79,6 @@ async def _load_tenant(tenant_id: str) -> TenantContext:
         bucket=bucket,
         prefix=data.get("prefix", f"{tenant_id}/"),
         file_search_store_name=data.get("file_search_store_name"),
-        allow_url_scraping=data.get("allow_url_scraping", False),
         identity=identity,
         protocol=protocol,
         predetermined_answers=predetermined_answers,
