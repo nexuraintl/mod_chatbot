@@ -1,7 +1,7 @@
 import json
 import logging
 from functools import lru_cache
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, Optional
 
 from google import genai
 from google.genai import types
@@ -53,14 +53,12 @@ async def generate_answer(
     identity: Dict[str, Any],
     protocol: Dict[str, Any],
     file_search_store_name: Optional[str] = None,
-    extra_context: str = "",
 ) -> str:
     """
     Genera la respuesta final para el ciudadano.
 
     Si el tenant tiene un File Search Store asociado, se adjunta como Tool y Gemini
-    hace el retrieval sobre el knowledge/ del tenant automáticamente. `extra_context`
-    es contexto adicional opcional (ej. resultado de scraping de una URL puntual).
+    hace el retrieval sobre el knowledge/ del tenant automáticamente.
     """
     system_instruction = _build_system_instruction(identity, protocol)
 
@@ -68,12 +66,7 @@ async def generate_answer(
     if file_search_store_name:
         tools = [types.Tool(file_search=types.FileSearch(file_search_store_names=[file_search_store_name]))]
 
-    prompt_parts = [f"PREGUNTA DEL CIUDADANO:\n{question}"]
-    if extra_context and len(extra_context.strip()) > 10:
-        prompt_parts.append(
-            f"CONTEXTO ADICIONAL (fuente secundaria, complementa la base de conocimiento):\n{extra_context}"
-        )
-    prompt = "\n\n".join(prompt_parts)
+    prompt = f"PREGUNTA DEL CIUDADANO:\n{question}"
 
     try:
         response = _client().models.generate_content(
@@ -88,58 +81,3 @@ async def generate_answer(
     except Exception as e:
         logger.error("gemini_generate_error", exc_info=True, extra={"error": str(e)})
         return "Lo siento, ocurrió un error al procesar la respuesta. Por favor intente de nuevo."
-
-
-async def is_context_sufficient(question: str, context_text: str) -> bool:
-    """Decide si vale la pena sumar contexto de scraping al prompt (evita inflarlo con ruido irrelevante)."""
-    if not context_text or len(context_text.strip()) < 100:
-        return False
-
-    prompt = f"""
-    ¿El siguiente CONTEXTO tiene información suficiente para responder a la PREGUNTA?
-    Responde estrictamente SI o NO.
-
-    PREGUNTA: {question}
-    CONTEXTO: {context_text[:2000]}
-    """
-    try:
-        response = _client().models.generate_content(model=MODEL_NAME, contents=prompt)
-        return "SI" in response.text.upper()
-    except Exception as e:
-        logger.warning("gemini_context_check_failed", exc_info=True, extra={"error": str(e)})
-        return False
-
-
-async def filter_relevant_links(question: str, links: List[Tuple[str, str]], max_links: int = 5) -> List[str]:
-    """Usa IA para seleccionar qué URLs de una página son útiles para la pregunta (modo explorador de scraping)."""
-    if not links:
-        return []
-
-    link_list_str = "\n".join([f"- Título: {title} | URL: {url}" for title, url in links])
-
-    prompt = f"""
-    Eres un experto en navegación web. Tu tarea es filtrar una lista de enlaces y seleccionar solo los que ayuden a responder la pregunta del usuario.
-
-    PREGUNTA: "{question}"
-
-    LISTA DE ENLACES:
-    {link_list_str}
-
-    INSTRUCCIONES:
-    1. Selecciona máximo {max_links} URLs que tengan la mayor probabilidad de contener la respuesta.
-    2. Responde ÚNICAMENTE con las URLs puras separadas por comas.
-    3. Si ningún enlace es relevante, responde con la palabra: NINGUNO.
-    """
-
-    try:
-        response = _client().models.generate_content(model=MODEL_NAME, contents=prompt)
-        content = response.text.strip()
-
-        if "NINGUNO" in content:
-            return []
-
-        urls = [url.strip() for url in content.split(",") if "http" in url]
-        return urls[:max_links]
-    except Exception as e:
-        logger.warning("gemini_link_filter_failed", exc_info=True, extra={"error": str(e)})
-        return [url for _, url in links[:max_links]]

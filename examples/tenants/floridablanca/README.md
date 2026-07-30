@@ -45,7 +45,6 @@ db.collection("tenants").document("floridablanca").set({
     "identity_path": "floridablanca/identity.json",
     "protocol_path": "floridablanca/protocol.json",
     "predetermined_answers_path": "floridablanca/predetermined_answers.json",
-    "allow_url_scraping": False,
 })
 ```
 

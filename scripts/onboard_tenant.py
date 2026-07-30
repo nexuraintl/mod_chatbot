@@ -42,7 +42,6 @@ def create_tenant_doc(tenant_id: str, bucket_name: str, prefix: str, display_nam
             "identity_path": f"{prefix}identity.json",
             "protocol_path": f"{prefix}protocol.json",
             "predetermined_answers_path": f"{prefix}predetermined_answers.json",
-            "allow_url_scraping": False,
         }
     )
     print(f"Documento Firestore creado: tenants/{tenant_id}")
